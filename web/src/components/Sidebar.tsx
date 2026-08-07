@@ -11,7 +11,8 @@ import {
   PanelLeftClose, 
   PanelLeftOpen, 
   Check, 
-  X
+  X,
+  Folder
 } from 'lucide-react';
 import type { Conversation } from '../types/chat';
 
@@ -67,52 +68,53 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <aside
-      className={`fixed md:static inset-y-0 left-0 z-30 w-72 bg-slate-900 border-r border-slate-800 flex flex-col transition-all duration-300 transform ${
+      className={`fixed md:static inset-y-0 left-0 z-30 w-[320px] glass-sidebar flex flex-col transition-all duration-300 transform ${
         open ? 'translate-x-0' : '-translate-x-full md:translate-x-0 md:w-16'
       }`}
     >
       {/* Top Header Actions */}
-      <div className="p-3 flex items-center justify-between border-b border-slate-800">
+      <div className="p-4 flex items-center justify-between border-b border-slate-800">
         <button
           onClick={onNewChat}
-          className={`flex-1 flex items-center justify-center space-x-2 py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm shadow-md shadow-blue-500/20 transition-all ${
+          className={`flex-1 flex items-center justify-center space-x-2 py-3 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm shadow-md shadow-blue-500/25 transition-all ${
             !open && 'md:px-0 md:w-10'
           }`}
         >
-          <Plus className="w-4 h-4" />
-          <span className={`${!open && 'md:hidden'}`}>New Chat</span>
+          <Plus className="w-5 h-5" />
+          <span className={`${!open && 'md:hidden'}`}>New Conversation</span>
         </button>
 
         <button
           onClick={() => setOpen(!open)}
-          className="p-2 rounded-xl text-slate-400 hover:bg-slate-800 hidden md:block ml-2"
+          className="p-2.5 rounded-xl text-slate-400 hover:bg-slate-800 hidden md:block ml-2 transition-colors"
           title={open ? "Collapse Sidebar" : "Expand Sidebar"}
         >
-          {open ? <PanelLeftClose className="w-4 h-4" /> : <PanelLeftOpen className="w-4 h-4" />}
+          {open ? <PanelLeftClose className="w-5 h-5" /> : <PanelLeftOpen className="w-5 h-5" />}
         </button>
       </div>
 
       {/* Search Input */}
       {open && (
-        <div className="px-3 pt-3">
+        <div className="px-4 pt-3 pb-1">
           <div className="relative">
-            <Search className="w-3.5 h-3.5 absolute left-3 top-3 text-slate-400" />
+            <Search className="w-4 h-4 absolute left-3.5 top-3 text-slate-400" />
             <input
               type="text"
               placeholder="Search conversations..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
-              className="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl bg-slate-800 border border-slate-700 text-white placeholder-slate-400 outline-none focus:border-blue-500"
+              className="w-full pl-9 pr-3.5 py-2 text-xs rounded-xl bg-slate-800/80 border border-slate-700/80 text-white placeholder-slate-400 outline-none focus:border-blue-500 transition-all"
             />
           </div>
         </div>
       )}
 
       {/* Conversation List */}
-      <div className="flex-1 overflow-y-auto px-2 py-3 space-y-4">
+      <div className="flex-1 overflow-y-auto px-3 py-3 space-y-5">
+        {/* Pinned Chats */}
         {pinned.length > 0 && (
           <div>
-            <div className={`px-2 text-[10px] font-bold tracking-wider text-slate-400 uppercase mb-1.5 ${!open && 'md:hidden'}`}>
+            <div className={`px-2 text-[10px] font-extrabold tracking-wider text-slate-400 uppercase mb-2 ${!open && 'md:hidden'}`}>
               Pinned Chats
             </div>
             <div className="space-y-1">
@@ -137,8 +139,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
         )}
 
+        {/* Recent Conversations */}
         <div>
-          <div className={`px-2 text-[10px] font-bold tracking-wider text-slate-400 uppercase mb-1.5 ${!open && 'md:hidden'}`}>
+          <div className={`px-2 text-[10px] font-extrabold tracking-wider text-slate-400 uppercase mb-2 ${!open && 'md:hidden'}`}>
             Recent Conversations
           </div>
           <div className="space-y-1">
@@ -161,13 +164,32 @@ export const Sidebar: React.FC<SidebarProps> = ({
             ))}
           </div>
         </div>
+
+        {/* Document Folders Shortcut */}
+        {open && (
+          <div>
+            <div className="px-2 text-[10px] font-extrabold tracking-wider text-slate-400 uppercase mb-2">
+              Legal Folders
+            </div>
+            <div className="space-y-1">
+              <div className="flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs text-slate-400 hover:bg-slate-800/60 cursor-pointer transition-colors">
+                <Folder className="w-4 h-4 text-amber-400" />
+                <span>Affidavits & Contracts</span>
+              </div>
+              <div className="flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs text-slate-400 hover:bg-slate-800/60 cursor-pointer transition-colors">
+                <Folder className="w-4 h-4 text-blue-400" />
+                <span>Python & PyTorch Scripts</span>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Footer System Nav */}
-      <div className="p-2 border-t border-slate-800 space-y-1.5">
+      <div className="p-3 border-t border-slate-800 space-y-2">
         <button
           onClick={onOpenDashboard}
-          className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-slate-200 transition-colors"
+          className="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-slate-200 font-medium transition-all"
         >
           <Activity className="w-4 h-4 text-blue-400" />
           <span className={`${!open && 'md:hidden'}`}>Model Dashboard</span>
@@ -175,7 +197,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         <button
           onClick={onOpenSettings}
-          className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-slate-200 transition-colors"
+          className="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-slate-200 font-medium transition-all"
         >
           <Settings className="w-4 h-4 text-slate-400" />
           <span className={`${!open && 'md:hidden'}`}>Parameters & Settings</span>
@@ -183,7 +205,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {open && (
           <div className="pt-2 px-3 pb-1 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
-            <span>LawSLM Engine</span>
+            <span className="font-semibold text-slate-300">LawSLM Engine</span>
             <span>By Amit Kumar</span>
           </div>
         )}
@@ -224,21 +246,21 @@ const ConversationItem: React.FC<ItemProps> = ({
   return (
     <div
       onClick={onSelect}
-      className={`group relative flex items-center justify-between px-3 py-2 rounded-xl text-xs cursor-pointer transition-colors ${
+      className={`group relative flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs cursor-pointer transition-all ${
         active
-          ? 'bg-blue-600/20 border border-blue-500/40 text-blue-400 font-semibold'
-          : 'text-slate-300 hover:bg-slate-800 border border-transparent'
+          ? 'bg-blue-600/20 border border-blue-500/40 text-blue-300 font-semibold'
+          : 'text-slate-300 hover:bg-slate-800/80 border border-transparent'
       }`}
     >
-      <div className="flex items-center space-x-2.5 min-w-0">
-        <MessageSquare className="w-4 h-4 flex-shrink-0 text-slate-400 group-hover:text-blue-400" />
+      <div className="flex items-center space-x-3 min-w-0">
+        <MessageSquare className="w-4 h-4 flex-shrink-0 text-slate-400 group-hover:text-blue-400 transition-colors" />
         {editing ? (
           <input
             type="text"
             value={editingTitle}
             onChange={e => setEditingTitle(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && onSaveRename()}
-            className="w-full px-1.5 py-0.5 text-xs bg-slate-900 border border-blue-500 rounded text-white outline-none"
+            className="w-full px-2 py-1 text-xs bg-slate-900 border border-blue-500 rounded-lg text-white outline-none"
             autoFocus
           />
         ) : (

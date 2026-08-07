@@ -229,8 +229,29 @@ export function App() {
     }
   };
 
+  const handleEditMessage = (id: string, newText: string) => {
+    setConversations(prev => prev.map(c => {
+      if (c.id !== activeId) return c;
+      const msgs: Message[] = c.messages.map((m): Message => {
+        if (m.id === id) {
+          return { ...m, content: newText };
+        }
+        return m;
+      });
+      return { ...c, messages: msgs };
+    }));
+    handleSendMessage(newText);
+  };
+
+  const handleDeleteMessage = (id: string) => {
+    setConversations(prev => prev.map(c => {
+      if (c.id !== activeId) return c;
+      return { ...c, messages: c.messages.filter(m => m.id !== id) };
+    }));
+  };
+
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-slate-50 dark:bg-darkbg-900 text-slate-900 dark:text-slate-100">
+    <div className="flex h-screen w-screen overflow-hidden bg-slate-900 text-slate-100">
       {/* Sidebar Navigation */}
       <Sidebar
         conversations={conversations}
@@ -247,7 +268,7 @@ export function App() {
       />
 
       {/* Main Workspace Column */}
-      <div className="flex-1 flex flex-col min-w-0 h-full">
+      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
         <Header
           darkMode={darkMode}
           setDarkMode={setDarkMode}
@@ -265,6 +286,9 @@ export function App() {
           onSendMessage={handleSendMessage}
           onRegenerate={handleRegenerate}
           onOpenPDFPreview={pdf => setPdfModalData(pdf)}
+          onEditMessage={handleEditMessage}
+          onDeleteMessage={handleDeleteMessage}
+          isGenerating={isGenerating}
         />
 
         {/* Chat Input Toolbar */}
