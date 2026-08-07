@@ -25,6 +25,10 @@ class ConversationMemory:
         """Clears memory."""
         self.history.clear()
 
+    def get_history(self) -> List[Dict[str, str]]:
+        """Returns the current conversation history."""
+        return list(self.history)
+
     def resolve_coreference(self, prompt: str) -> str:
         """
         Resolves references like 'this', 'that', 'previous answer', 'above' by attaching last topic context.
