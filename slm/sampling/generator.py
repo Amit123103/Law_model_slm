@@ -222,6 +222,11 @@ class TextGenerator:
             # Check stop condition
             if next_token in stop_token_ids:
                 break
+                
+            # Stop if generating new turn boundary ("User:" or "\nUser")
+            recent_text = self.tokenizer.decode(generated_ids[len(prompt_token_ids):], skip_special_tokens=True)
+            if "\nUser" in recent_text or "\nUser:" in recent_text or "User:" in recent_text:
+                break
 
         full_output = self.tokenizer.decode(generated_ids, skip_special_tokens=True)
         return full_output
