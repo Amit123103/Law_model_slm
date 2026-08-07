@@ -4,14 +4,12 @@ import {
   Sun, 
   Moon, 
   Settings, 
-  LayoutDashboard, 
   Sparkles, 
-  FileText, 
   Activity,
   Menu,
   ChevronDown
 } from 'lucide-react';
-import { ModelStats } from '../types/chat';
+import type { ModelStats } from '../types/chat';
 
 interface HeaderProps {
   darkMode: boolean;

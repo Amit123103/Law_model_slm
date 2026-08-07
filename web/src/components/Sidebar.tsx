@@ -6,18 +6,14 @@ import {
   MessageSquare, 
   Trash2, 
   Edit3, 
-  Download, 
-  FolderPlus, 
   Settings, 
   Activity, 
-  HelpCircle, 
   PanelLeftClose, 
   PanelLeftOpen, 
   Check, 
-  X,
-  Scale
+  X
 } from 'lucide-react';
-import { Conversation } from '../types/chat';
+import type { Conversation } from '../types/chat';
 
 interface SidebarProps {
   conversations: Conversation[];
@@ -96,7 +92,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </button>
       </div>
 
-      {/* Search Input (visible when open) */}
+      {/* Search Input */}
       {open && (
         <div className="px-3 pt-3">
           <div className="relative">
@@ -114,7 +110,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Conversation List */}
       <div className="flex-1 overflow-y-auto px-2 py-3 space-y-4">
-        {/* Pinned Section */}
         {pinned.length > 0 && (
           <div>
             <div className={`px-2 text-[10px] font-bold tracking-wider text-slate-400 uppercase mb-1.5 ${!open && 'md:hidden'}`}>
@@ -142,7 +137,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
         )}
 
-        {/* Recent Section */}
         <div>
           <div className={`px-2 text-[10px] font-bold tracking-wider text-slate-400 uppercase mb-1.5 ${!open && 'md:hidden'}`}>
             Recent Conversations
