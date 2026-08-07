@@ -101,7 +101,7 @@ async def startup_event() -> None:
             "Decoder-only Transformer architecture using pure PyTorch tensor operations."
         ], vocab_size=2000)
 
-    state.model_config.vocab_size = state.tokenizer.vocab.vocab_size
+    state.model_config.vocab_size = len(state.tokenizer.vocab)
     state.model = SLMForCausalLM(state.model_config)
 
     if os.path.exists(ckpt_path):
