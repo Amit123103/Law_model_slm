@@ -4,7 +4,7 @@ FastAPI REST API Server for Small Language Model inference, tokenization, and he
 
 import os
 from typing import List, Optional, Dict, Any
-from fastapi import FastAPI, HTTPException, Status
+from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel, Field
 
 from slm.config.model_config import ModelConfig
