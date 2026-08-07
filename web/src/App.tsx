@@ -173,7 +173,7 @@ export function App() {
         (chunkText: string) => {
           setConversations(prev => prev.map(c => {
             if (c.id !== activeId) return c;
-            const msgs = c.messages.map(m => {
+            const msgs: Message[] = c.messages.map((m): Message => {
               if (m.id === assistantMsgId) {
                 return { ...m, content: chunkText };
               }
@@ -200,7 +200,7 @@ export function App() {
 
       setConversations(prev => prev.map(c => {
         if (c.id !== activeId) return c;
-        const msgs = c.messages.map(m => {
+        const msgs: Message[] = c.messages.map((m): Message => {
           if (m.id === assistantMsgId) {
             return {
               ...m,
@@ -210,6 +210,7 @@ export function App() {
               pdfPreview: currentPdfMeta
             };
           }
+          return m;
         });
         return { ...c, messages: msgs };
       }));
