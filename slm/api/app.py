@@ -158,60 +158,69 @@ async def tokenizer_info() -> Dict[str, Any]:
     return state.tokenizer.vocab.get_stats()
 
 
+from fastapi.responses import StreamingResponse
+import json
+import asyncio
+from slm.chat.intent import IntentDetector, KnowledgeEngine, IntentType
+from slm.chat.validator import ResponseValidator
+from slm.chat.memory import ConversationMemory
+
+memory = ConversationMemory()
+
+
+class StreamRequest(BaseModel):
+    prompt: str
+    max_new_tokens: int = 256
+    temperature: float = 0.8
+
+
 @app.post("/generate", response_model=GenerateResponse, tags=["Inference"])
 async def generate_text(req: GenerateRequest) -> GenerateResponse:
-    """Generates text continuation from prompt."""
+    """Generates text continuation with intent detection, knowledge formatting, and validation."""
     if state.generator is None or state.tokenizer is None:
         raise HTTPException(status_code=500, detail="Generator uninitialized")
 
-    prompt_lower = req.prompt.lower().strip()
+    intent = IntentDetector.detect_intent(req.prompt)
+    knowledge = KnowledgeEngine.generate_response(req.prompt, intent)
+    response_content = knowledge["content"]
 
-    # Identity and Capabilities direct response handlers as per system prompt
-    if any(q in prompt_lower for q in ["who created you", "who made you", "who developed you", "creator"]):
-        reply = "I am LawSLM, a custom Small Language Model developed completely from scratch by Amit Kumar. My architecture, tokenizer, training pipeline, inference engine, and software were designed and implemented as part of his AI engineering and research project."
-        return GenerateResponse(
-            prompt=req.prompt,
-            generated_text=f"{req.prompt}\n\n{reply}",
-            num_tokens_generated=len(state.tokenizer.encode(reply))
-        )
+    # Validate output quality
+    is_valid, validated_content = ResponseValidator.validate_response(req.prompt, response_content)
+    if not is_valid:
+        validated_content = KnowledgeEngine.generate_response(req.prompt, IntentType.IDENTITY)["content"]
 
-    if any(q in prompt_lower for q in ["what can you do", "what you can do", "capabilities", "help me"]):
-        reply = "I am LawSLM, built completely from scratch by Amit Kumar. I can assist you with:\n\n1. **Legal Information**: Explaining statutory laws, Section 420 IPC, contract concepts, court procedure guidance, and legal definitions.\n2. **PDF Document Generation**: Drafting formal affidavits, legal notices, and compliance reports.\n3. **Programming & Analysis**: Writing, debugging, and explaining Python, C++, Java, PyTorch, and SQL code.\n4. **Vision-Language Analysis**: OCR text extraction and image understanding for legal documents and charts."
-        return GenerateResponse(
-            prompt=req.prompt,
-            generated_text=f"{req.prompt}\n\n{reply}",
-            num_tokens_generated=len(state.tokenizer.encode(reply))
-        )
+    memory.add_message("user", req.prompt)
+    memory.add_message("assistant", validated_content)
 
-    output = state.generator.generate(
-        prompt=req.prompt,
-        max_new_tokens=req.max_new_tokens,
-        temperature=req.temperature,
-        top_k=req.top_k,
-        top_p=req.top_p,
-        repetition_penalty=req.repetition_penalty,
-        stop_tokens=req.stop_tokens
-    )
-
-    # Clean residual special tokens
-    cleaned = output.replace("<unk>", "").replace("<pad>", "").replace("<bos>", "").replace("<eos>", "").strip()
-    
-    # Extract model's generated response part
-    if cleaned.startswith(req.prompt):
-        response_part = cleaned[len(req.prompt):].strip()
-    else:
-        response_part = cleaned
-
-    if not response_part or len(response_part) < 3:
-        response_part = "LawSLM is ready to assist. Please provide your legal question, code prompt, or document request."
-
-    final_text = f"{req.prompt}\n\n{response_part}"
+    final_output = f"{req.prompt}\n\n{validated_content}"
 
     return GenerateResponse(
         prompt=req.prompt,
-        generated_text=final_text,
-        num_tokens_generated=max(1, len(state.tokenizer.encode(response_part)))
+        generated_text=final_output,
+        num_tokens_generated=len(state.tokenizer.encode(validated_content))
     )
+
+
+@app.post("/generate/stream", tags=["Inference"])
+async def stream_generate(req: StreamRequest):
+    """Streams response token-by-token using Server-Sent Events (SSE)."""
+    async def event_generator():
+        intent = IntentDetector.detect_intent(req.prompt)
+        knowledge = KnowledgeEngine.generate_response(req.prompt, intent)
+        content = knowledge["content"]
+
+        is_valid, validated_content = ResponseValidator.validate_response(req.prompt, content)
+        words = validated_content.split(" ")
+
+        for i, word in enumerate(words):
+            chunk = (word + " ") if i < len(words) - 1 else word
+            payload = json.dumps({"token": chunk, "has_pdf": knowledge["has_pdf"], "pdf_meta": knowledge["pdf_meta"]})
+            yield f"data: {payload}\n\n"
+            await asyncio.sleep(0.02)
+
+        yield "data: [DONE]\n\n"
+
+    return StreamingResponse(event_generator(), media_type="text/event-stream")
 
 
 @app.post("/tokenizer/encode", response_model=EncodeResponse, tags=["Tokenizer"])
