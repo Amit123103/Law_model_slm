@@ -176,18 +176,19 @@ class StreamRequest(BaseModel):
 
 @app.post("/generate", response_model=GenerateResponse, tags=["Inference"])
 async def generate_text(req: GenerateRequest) -> GenerateResponse:
-    """Generates text continuation with intent detection, knowledge formatting, and validation."""
+    """Generates text with intent detection, natural responses, and quality validation."""
     if state.generator is None or state.tokenizer is None:
         raise HTTPException(status_code=500, detail="Generator uninitialized")
 
-    intent = IntentDetector.detect_intent(req.prompt)
-    knowledge = KnowledgeEngine.generate_response(req.prompt, intent)
+    history = memory.get_history()
+    intent = IntentDetector.detect_intent(req.prompt, history)
+    knowledge = KnowledgeEngine.generate_response(req.prompt, intent, history)
     response_content = knowledge["content"]
 
-    # Validate output quality
-    is_valid, validated_content = ResponseValidator.validate_response(req.prompt, response_content)
+    # Validate output quality — strip template artifacts
+    is_valid, validated_content = ResponseValidator.validate_response(response_content)
     if not is_valid:
-        validated_content = KnowledgeEngine.generate_response(req.prompt, IntentType.IDENTITY)["content"]
+        validated_content = KnowledgeEngine.generate_response(req.prompt, IntentType.ABOUT_SELF)["content"]
 
     memory.add_message("user", req.prompt)
     memory.add_message("assistant", validated_content)
@@ -203,13 +204,20 @@ async def generate_text(req: GenerateRequest) -> GenerateResponse:
 
 @app.post("/generate/stream", tags=["Inference"])
 async def stream_generate(req: StreamRequest):
-    """Streams response token-by-token using Server-Sent Events (SSE)."""
+    """Streams natural response token-by-token using Server-Sent Events (SSE)."""
     async def event_generator():
-        intent = IntentDetector.detect_intent(req.prompt)
-        knowledge = KnowledgeEngine.generate_response(req.prompt, intent)
+        history = memory.get_history()
+        intent = IntentDetector.detect_intent(req.prompt, history)
+        knowledge = KnowledgeEngine.generate_response(req.prompt, intent, history)
         content = knowledge["content"]
 
-        is_valid, validated_content = ResponseValidator.validate_response(req.prompt, content)
+        is_valid, validated_content = ResponseValidator.validate_response(content)
+        if not is_valid:
+            validated_content = "I'm here to help! Could you rephrase your question?"
+
+        memory.add_message("user", req.prompt)
+        memory.add_message("assistant", validated_content)
+
         words = validated_content.split(" ")
 
         for i, word in enumerate(words):
