@@ -48,11 +48,12 @@ def start_chat(checkpoint_path: str = None) -> None:
     """
     Launches an interactive console terminal chat interface.
     """
-    print("\n" + "=" * 60)
-    print("  SLM INTERACTIVE CHAT ENGINE (Built Completely From Scratch)")
-    print("=" * 60)
+    print("\n" + "=" * 65)
+    print("  LawSLM INTERACTIVE ASSISTANT (Built Completely From Scratch)")
+    print("  Role: Legal Information, General AI, Programming & Analysis")
+    print("=" * 65)
     print("Type your question/prompt below. Type 'exit', 'quit', or 'q' to end session.")
-    print("=" * 60 + "\n")
+    print("=" * 65 + "\n")
 
     resolved_path = resolve_checkpoint_path(checkpoint_path)
 

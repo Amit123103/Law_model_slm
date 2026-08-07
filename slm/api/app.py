@@ -96,6 +96,14 @@ async def health_check() -> Dict[str, str]:
     return {"status": "healthy", "service": "lawslm-api"}
 
 
+from slm.config.system_prompt import LAWSLM_SYSTEM_PROMPT
+
+@app.get("/system-prompt", tags=["Model"])
+async def get_system_prompt() -> Dict[str, str]:
+    """Returns the LawSLM system prompt defining model capabilities, roles, and safety rules."""
+    return {"system_prompt": LAWSLM_SYSTEM_PROMPT}
+
+
 @app.get("/info", tags=["Model"])
 async def model_info() -> Dict[str, Any]:
     """Returns model parameters, architecture stats, and active device."""
