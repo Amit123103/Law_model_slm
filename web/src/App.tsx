@@ -123,14 +123,6 @@ export function App() {
     const shouldRename = activeConv.messages.length === 0;
     const updatedTitle = shouldRename ? (text.length > 25 ? text.substring(0, 25) + '...' : text) : activeConv.title;
 
-    const updatedMessages = [...activeConv.messages, userMsg];
-    setConversations(conversations.map(c => c.id === activeId ? {
-      ...c,
-      title: updatedTitle,
-      messages: updatedMessages,
-      updatedAt: timestamp
-    } : c));
-
     setIsGenerating(true);
 
     const assistantMsgId = `msg-${Date.now() + 1}`;
@@ -160,8 +152,11 @@ export function App() {
       pdfPreview: pdfPreviewData
     };
 
+    // SINGLE atomic state update — adds userMsg + placeholder assistant msg together
     setConversations(prev => prev.map(c => c.id === activeId ? {
       ...c,
+      title: updatedTitle,
+      updatedAt: timestamp,
       messages: [...c.messages, userMsg, placeholderAssistantMsg]
     } : c));
 
