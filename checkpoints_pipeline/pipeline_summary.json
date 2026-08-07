@@ -1,6 +1,6 @@
 {
   "pipeline_status": "SUCCESS",
-  "total_execution_time_seconds": 3.99,
+  "total_execution_time_seconds": 3.45,
   "cleaning_stats": {
     "total_input_documents": 60,
     "retained_documents": 60,
@@ -48,8 +48,8 @@
     "perplexity": 1.0,
     "top_1_accuracy": 0.0,
     "top_5_accuracy": 0.0,
-    "tokens_per_second": 183.81,
-    "ms_per_token": 5.44
+    "tokens_per_second": 184.04,
+    "ms_per_token": 5.43
   },
   "output_directory": "checkpoints_pipeline"
 }
