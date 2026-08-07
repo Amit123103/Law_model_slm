@@ -84,7 +84,7 @@ export async function sendChatMessage(
       const data = await res.json();
       let text = data.generated_text || data.text || '';
       if (text.startsWith(prompt)) {
-        text = text.substring(prompt.length).strip ? text.substring(prompt.length).trim() : text;
+        text = text.substring(prompt.length).trim();
       }
       text = text.replace(/<unk>/g, '').replace(/<pad>/g, '').replace(/<bos>/g, '').replace(/<eos>/g, '').trim();
       if (!text) {
