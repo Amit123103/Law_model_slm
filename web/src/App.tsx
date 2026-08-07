@@ -166,11 +166,11 @@ export function App() {
     } : c));
 
     try {
-      let currentPdfMeta = pdfPreviewData;
+      let currentPdfMeta: Message['pdfPreview'] = pdfPreviewData;
       const responseText = await streamChatMessage(
         text,
         params,
-        (chunkText) => {
+        (chunkText: string) => {
           setConversations(prev => prev.map(c => {
             if (c.id !== activeId) return c;
             const msgs = c.messages.map(m => {
@@ -182,7 +182,7 @@ export function App() {
             return { ...c, messages: msgs };
           }));
         },
-        (meta) => {
+        (meta: { hasPdf?: boolean; pdfMeta?: any }) => {
           if (meta.hasPdf && meta.pdfMeta) {
             currentPdfMeta = {
               title: meta.pdfMeta.title || "FORMAL DOCUMENT REPORT",
@@ -204,16 +204,15 @@ export function App() {
           if (m.id === assistantMsgId) {
             return {
               ...m,
-              content: responseText,
+              content: responseText || m.content,
               isStreaming: false,
-              responseTimeMs: endTime - startTime
+              responseTimeMs: endTime - startTime,
+              pdfPreview: currentPdfMeta
             };
           }
-          return m;
         });
         return { ...c, messages: msgs };
       }));
-
     } catch (err) {
       console.error(err);
     } finally {
