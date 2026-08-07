@@ -52,9 +52,17 @@ class PipelineOrchestrator:
         logger.info("  STARTING AUTOMATED END-TO-END SLM PIPELINE")
         logger.info("============================================================")
 
-        # STAGE 1 & 2: Cleaning & Preprocessing
-        logger.info("[Stage 1/10] Cleaning and Preprocessing Corpus...")
+        # STAGE 1: Cleaning & Dataset Mixture
+        logger.info("[Stage 1/10] Cleaning and Preprocessing Corpus & Dataset Mixture...")
+        from slm.dataset.mixer import DatasetMixer
+        from slm.config.dataset_config import DatasetMixConfig
+        
         cleaner = DataCleaner(min_doc_chars=10, min_doc_words=2)
+        if isinstance(raw_documents, dict):
+            # Domain mapping provided: {"general": [...], "legal": [...], "instruction": [...]}
+            mixer = DatasetMixer(DatasetMixConfig())
+            raw_documents = mixer.mix_corpora(raw_documents)
+
         cleaned_docs, clean_stats = cleaner.process_corpus(raw_documents)
 
         # STAGE 3: Tokenizer Training
