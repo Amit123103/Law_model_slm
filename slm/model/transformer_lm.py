@@ -104,6 +104,9 @@ class SLMForCausalLM(nn.Module):
         Returns:
             Tuple of (logits [batch_size, seq_len, vocab_size], loss (Scalar Tensor or None)).
         """
+        if targets is None:
+            targets = target_ids if target_ids is not None else labels
+
         batch_size, seq_len = input_ids.size()
         device = input_ids.device
 
