@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import { MessageCard } from './MessageCard';
-import { Message } from '../types/chat';
-import { Scale, Sparkles, Code, FileText, HelpCircle, Shield } from 'lucide-react';
+import type { Message } from '../types/chat';
+import { Scale, Sparkles, Code, FileText, Shield } from 'lucide-react';
 
 interface ChatAreaProps {
   messages: Message[];

@@ -1,4 +1,5 @@
-import React, { useState, useRef, KeyboardEvent } from 'react';
+import React, { useState, useRef } from 'react';
+import type { KeyboardEvent } from 'react';
 import { Send, Paperclip, Mic, FileText, Image as ImageIcon, Sparkles, StopCircle } from 'lucide-react';
 
 interface ChatInputProps {
