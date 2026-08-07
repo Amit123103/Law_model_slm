@@ -5,6 +5,7 @@ FastAPI REST API Server for Small Language Model inference, tokenization, and he
 import os
 from typing import List, Optional, Dict, Any
 from fastapi import FastAPI, HTTPException, status
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from slm.config.model_config import ModelConfig
@@ -12,6 +13,7 @@ from slm.config.train_config import TrainConfig
 from slm.model.transformer_lm import SLMForCausalLM
 from slm.tokenizer.bpe import BPETokenizer
 from slm.sampling.generator import TextGenerator
+from slm.checkpoint.manager import CheckpointManager
 from slm.utils.logger import get_logger
 from slm.utils.utils import count_parameters, get_device
 
@@ -21,6 +23,15 @@ app = FastAPI(
     title="SLM REST API",
     description="Production Small Language Model REST API built completely from scratch in PyTorch.",
     version="0.1.0"
+)
+
+# Enable CORS for Web UI integration
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Global State Container
@@ -73,19 +84,30 @@ class DecodeResponse(BaseModel):
 
 @app.on_event("startup")
 async def startup_event() -> None:
-    """Initializes demo model and tokenizer on application startup."""
+    """Initializes model and tokenizer on application startup."""
     logger.info("Initializing SLM API application state...")
-    config = ModelConfig(vocab_size=1000, d_model=128, n_heads=4, n_layers=2, d_ff=512)
-    state.model_config = config
+    ckpt_path = "checkpoints/best_model.pt"
+    tok_path = "checkpoints/tokenizer.json"
+
+    state.model_config = ModelConfig()
     state.train_config = TrainConfig()
 
     state.tokenizer = BPETokenizer()
-    state.tokenizer.train_on_texts([
-        "Hello world! This is a Small Language Model built completely from scratch.",
-        "Decoder-only Transformer architecture using pure PyTorch tensor operations."
-    ], vocab_size=config.vocab_size)
+    if os.path.exists(tok_path):
+        state.tokenizer.load(tok_path)
+    else:
+        state.tokenizer.train_on_texts([
+            "Hello world! LawSLM is a Small Language Model built completely from scratch by Amit Kumar.",
+            "Decoder-only Transformer architecture using pure PyTorch tensor operations."
+        ], vocab_size=2000)
 
-    state.model = SLMForCausalLM(config)
+    state.model_config.vocab_size = state.tokenizer.vocab_size
+    state.model = SLMForCausalLM(state.model_config)
+
+    if os.path.exists(ckpt_path):
+        CheckpointManager.load_checkpoint(ckpt_path, state.model)
+        logger.info(f"Loaded trained model weights from {ckpt_path}")
+
     state.generator = TextGenerator(state.model, state.tokenizer)
     logger.info("SLM REST API initialized successfully!")
 
