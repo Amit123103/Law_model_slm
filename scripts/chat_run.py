@@ -4,6 +4,7 @@ Interactive REPL Chat script for asking questions and chatting with the Small La
 
 import sys
 import os
+from typing import Optional
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
@@ -18,6 +19,31 @@ from slm.utils.logger import get_logger
 logger = get_logger("slm.chat")
 
 
+def resolve_checkpoint_path(target_path: Optional[str]) -> Optional[str]:
+    """Resolves checkpoint file path from file path, directory, or search folders."""
+    import glob
+    
+    if target_path:
+        # 1. Exact file path exists
+        if os.path.isfile(target_path):
+            return target_path
+        # 2. Directory path passed, search for .pt files
+        if os.path.isdir(target_path):
+            pts = sorted(glob.glob(os.path.join(target_path, "*.pt")))
+            if pts:
+                return pts[-1]
+                
+    # 3. Fallback search in default output directories
+    search_dirs = ["checkpoints_nano", "checkpoints", "checkpoints_micro", "checkpoints_base"]
+    for sdir in search_dirs:
+        if os.path.exists(sdir):
+            pts = sorted(glob.glob(os.path.join(sdir, "*.pt")))
+            if pts:
+                return pts[-1]
+                
+    return None
+
+
 def start_chat(checkpoint_path: str = None) -> None:
     """
     Launches an interactive console terminal chat interface.
@@ -28,14 +54,16 @@ def start_chat(checkpoint_path: str = None) -> None:
     print("Type your question/prompt below. Type 'exit', 'quit', or 'q' to end session.")
     print("=" * 60 + "\n")
 
-    if checkpoint_path and os.path.exists(checkpoint_path):
-        ckpt_dir = os.path.dirname(checkpoint_path)
-        logger.info(f"Loading model checkpoint from {checkpoint_path}...")
+    resolved_path = resolve_checkpoint_path(checkpoint_path)
+
+    if resolved_path:
+        ckpt_dir = os.path.dirname(resolved_path)
+        logger.info(f"Loading model checkpoint from {resolved_path}...")
         
         try:
-            ckpt_data = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
+            ckpt_data = torch.load(resolved_path, map_location="cpu", weights_only=False)
         except Exception:
-            ckpt_data = torch.load(checkpoint_path, map_location="cpu")
+            ckpt_data = torch.load(resolved_path, map_location="cpu")
             
         if isinstance(ckpt_data, dict) and "model_config" in ckpt_data:
             config = ModelConfig.from_dict(ckpt_data["model_config"])
@@ -45,16 +73,17 @@ def start_chat(checkpoint_path: str = None) -> None:
         model = SLMForCausalLM(config)
         
         manager = CheckpointManager(output_dir=ckpt_dir)
-        manager.load_checkpoint(checkpoint_path, model)
+        manager.load_checkpoint(resolved_path, model)
         
         tok_dir = os.path.join(ckpt_dir, "tokenizer")
         if os.path.exists(tok_dir):
             tokenizer = BPETokenizer.load(tok_dir)
         else:
+            logger.warning(f"Tokenizer directory not found at {tok_dir}. Training fallback tokenizer...")
             tokenizer = BPETokenizer()
             tokenizer.train_on_texts(["Interactive chat training text sample for tokenizer setup."], vocab_size=config.vocab_size)
     else:
-        logger.info("No checkpoint provided. Initializing active SLM model for demo chat session...")
+        logger.warning("No checkpoint file found in workspace! Initializing active SLM model for demo chat session...")
         config = ModelConfig(vocab_size=2000, d_model=128, n_heads=4, n_layers=2, d_ff=512)
         model = SLMForCausalLM(config)
         tokenizer = BPETokenizer()
