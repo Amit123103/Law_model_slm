@@ -1,0 +1,34 @@
+model:
+  vocab_size: 2000
+  d_model: 128
+  n_heads: 4
+  n_layers: 2
+  d_ff: 512
+  max_seq_len: 256
+  norm_type: "rmsnorm"
+  activation: "swiglu"
+  pos_encoding_type: "rope"
+  dropout: 0.1
+  bias: false
+  tie_word_embeddings: true
+
+training:
+  batch_size: 8
+  eval_batch_size: 8
+  learning_rate: 1.0e-3
+  min_learning_rate: 1.0e-4
+  weight_decay: 0.01
+  grad_clip_norm: 1.0
+  warmup_steps: 10
+  max_steps: 100
+  epochs: 5
+  grad_accum_steps: 1
+  optimizer_name: "adamw"
+  scheduler_name: "cosine"
+  mixed_precision: "fp32"
+  device: "auto"
+  seed: 42
+  output_dir: "checkpoints_nano"
+  save_interval_steps: 50
+  eval_interval_steps: 25
+  log_interval_steps: 10

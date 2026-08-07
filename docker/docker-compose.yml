@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  slm-api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: slm_api_service
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ../checkpoints:/app/checkpoints
+    restart: unless-stopped
+
+  slm-trainer:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: slm_trainer_service
+    command: python -m slm.cli.main train --config configs/nano_config.yaml
+    volumes:
+      - ../checkpoints:/app/checkpoints
+      - ../data:/app/data
+    profiles:
+      - train
