@@ -89,9 +89,6 @@ async def startup_event() -> None:
     ckpt_path = "checkpoints/best_model.pt"
     tok_path = "checkpoints/tokenizer.json"
 
-    state.model_config = ModelConfig()
-    state.train_config = TrainConfig()
-
     state.tokenizer = BPETokenizer()
     if os.path.exists(tok_path):
         state.tokenizer.load(tok_path)
@@ -101,7 +98,20 @@ async def startup_event() -> None:
             "Decoder-only Transformer architecture using pure PyTorch tensor operations."
         ], vocab_size=2000)
 
-    state.model_config.vocab_size = len(state.tokenizer.vocab)
+    if os.path.exists(ckpt_path):
+        try:
+            import torch
+            checkpoint = torch.load(ckpt_path, map_location="cpu", weights_only=False)
+            if "model_config" in checkpoint and isinstance(checkpoint["model_config"], dict):
+                state.model_config = ModelConfig.from_dict(checkpoint["model_config"])
+            else:
+                state.model_config = ModelConfig(vocab_size=len(state.tokenizer.vocab))
+        except Exception as e:
+            logger.warning(f"Failed to extract config from checkpoint: {e}")
+            state.model_config = ModelConfig(vocab_size=len(state.tokenizer.vocab))
+    else:
+        state.model_config = ModelConfig(vocab_size=len(state.tokenizer.vocab))
+
     state.model = SLMForCausalLM(state.model_config)
 
     if os.path.exists(ckpt_path):
