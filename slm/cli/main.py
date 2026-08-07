@@ -7,6 +7,7 @@ import os
 import sys
 from typing import List
 
+import torch
 from slm.config.config_loader import load_config, save_config
 from slm.config.model_config import ModelConfig
 from slm.config.train_config import TrainConfig

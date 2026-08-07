@@ -7,6 +7,7 @@ import os
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
+import torch
 from slm.config.model_config import ModelConfig
 from slm.model.transformer_lm import SLMForCausalLM
 from slm.tokenizer.bpe import BPETokenizer

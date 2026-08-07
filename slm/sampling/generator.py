@@ -86,6 +86,12 @@ class TextGenerator:
         # logits shape: [1, vocab_size]
         logits = logits / max(temperature, 1e-5)
 
+        # Exclude pad and unk special tokens from generation candidates
+        pad_id = self.tokenizer.vocab.pad_id
+        unk_id = self.tokenizer.vocab.unk_id
+        logits[..., pad_id] = float("-inf")
+        logits[..., unk_id] = float("-inf")
+
         # Minimum probability filtering
         if min_p > 0.0:
             probs = F.softmax(logits, dim=-1)
@@ -163,10 +169,10 @@ class TextGenerator:
         self.model.eval()
         dev = next(self.model.parameters()).device
 
-        # Encode prompt
-        prompt_token_ids = self.tokenizer.encode(prompt, add_special_tokens=True)
-        if not prompt_token_ids:
-            prompt_token_ids = [self.tokenizer.vocab.bos_id]
+        # Encode prompt (prepend BOS token, do not append EOS to generation prompt)
+        prompt_token_ids = self.tokenizer.encode(prompt, add_special_tokens=False)
+        if not prompt_token_ids or prompt_token_ids[0] != self.tokenizer.vocab.bos_id:
+            prompt_token_ids = [self.tokenizer.vocab.bos_id] + prompt_token_ids
 
         input_ids = torch.tensor([prompt_token_ids], dtype=torch.long, device=dev)
         generated_ids: List[int] = list(prompt_token_ids)
