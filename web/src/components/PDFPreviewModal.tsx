@@ -1,6 +1,6 @@
 import React from 'react';
-import { X, Printer, Download, FileText, CheckCircle, Scale } from 'lucide-react';
-import { Message } from '../types/chat';
+import { X, Download, FileText, Scale } from 'lucide-react';
+import type { Message } from '../types/chat';
 
 interface PDFPreviewModalProps {
   isOpen: boolean;

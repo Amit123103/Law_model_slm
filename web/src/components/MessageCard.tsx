@@ -8,11 +8,10 @@ import {
   ThumbsDown, 
   RotateCw, 
   FileText, 
-  Sparkles, 
   Clock, 
   Cpu
 } from 'lucide-react';
-import { Message } from '../types/chat';
+import type { Message } from '../types/chat';
 
 interface MessageCardProps {
   message: Message;
@@ -36,7 +35,7 @@ export const MessageCard: React.FC<MessageCardProps> = ({
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // Simple Markdown parsing for code blocks and bold text
+  // Simple Markdown parsing for code blocks and text
   const renderFormattedContent = (content: string) => {
     const codeBlockRegex = /```(\w*)\n([\s\S]*?)```/g;
     const parts = [];
