@@ -1,40 +1,14 @@
-/* Base & Glassmorphism Styling for LawSLM Web App */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+@layer base {
+  body {
+    @apply bg-slate-900 text-slate-100 font-sans antialiased selection:bg-blue-500 selection:text-white transition-colors duration-200;
+  }
 }
 
-body {
-  background-color: #0f172a;
-  color: #f8fafc;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  -webkit-font-smoothing: antialiased;
-  overflow: hidden;
-}
-
-/* Glassmorphism Classes */
-.glass-panel {
-  background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(51, 65, 85, 0.7);
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
-}
-
-.glass-card {
-  background: rgba(30, 41, 59, 0.6);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(51, 65, 85, 0.6);
-  transition: all 0.2s ease-in-out;
-}
-
-.glass-card:hover {
-  border-color: rgba(37, 99, 235, 0.6);
-  background: rgba(30, 41, 59, 0.8);
-}
-
-/* Custom Scrollbars */
+/* Custom Scrollbar Styling */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -53,18 +27,22 @@ body {
   background: #475569;
 }
 
-/* Animation Utilities */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
+/* Glassmorphism Utilities */
+.glass-panel {
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(51, 65, 85, 0.7);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
 }
 
-.animate-fade-in {
-  animation: fadeIn 0.25s ease-out forwards;
+.glass-card {
+  background: rgba(30, 41, 59, 0.6);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(51, 65, 85, 0.6);
+  transition: all 0.2s ease-in-out;
 }
 
-/* Utility Shortcuts */
-.bg-brand-500 { background-color: #2563eb !important; }
-.hover\:bg-brand-600:hover { background-color: #1d4ed8 !important; }
-.text-brand-500 { color: #3b82f6 !important; }
-.border-brand-500 { border-color: #2563eb !important; }
+.glass-card:hover {
+  border-color: rgba(37, 99, 235, 0.6);
+  background: rgba(30, 41, 59, 0.8);
+}
