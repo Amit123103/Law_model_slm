@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { ChatArea } from './components/ChatArea';
@@ -6,7 +6,7 @@ import { ChatInput } from './components/ChatInput';
 import { SettingsModal } from './components/SettingsModal';
 import { PDFPreviewModal } from './components/PDFPreviewModal';
 import { DashboardModal } from './components/DashboardModal';
-import { Conversation, Message, ModelParams, ModelStats } from './types/chat';
+import type { Conversation, Message, ModelParams, ModelStats } from './types/chat';
 import { sendChatMessage, fetchModelInfo, fetchSystemPrompt } from './services/api';
 
 const DEFAULT_PARAMS: ModelParams = {
@@ -120,7 +120,6 @@ export function App() {
       attachments
     };
 
-    // Auto-update conversation title if it's the first message
     const shouldRename = activeConv.messages.length === 0;
     const updatedTitle = shouldRename ? (text.length > 25 ? text.substring(0, 25) + '...' : text) : activeConv.title;
 
@@ -137,7 +136,6 @@ export function App() {
     const assistantMsgId = `msg-${Date.now() + 1}`;
     const startTime = Date.now();
 
-    // Check if user requested PDF generation
     const isPDFRequest = text.toLowerCase().includes('pdf') || text.toLowerCase().includes('report') || text.toLowerCase().includes('affidavit') || text.toLowerCase().includes('notice');
     
     let pdfPreviewData: Message['pdfPreview'] | undefined = undefined;
@@ -162,7 +160,6 @@ export function App() {
       pdfPreview: pdfPreviewData
     };
 
-    // Push initial empty streaming message
     setConversations(prev => prev.map(c => c.id === activeId ? {
       ...c,
       messages: [...c.messages, userMsg, placeholderAssistantMsg]
@@ -170,7 +167,6 @@ export function App() {
 
     try {
       const responseText = await sendChatMessage(text, params, (chunkText) => {
-        // Streaming chunk update
         setConversations(prev => prev.map(c => {
           if (c.id !== activeId) return c;
           const msgs = c.messages.map(m => {
@@ -185,7 +181,6 @@ export function App() {
 
       const endTime = Date.now();
 
-      // Finalize streaming state
       setConversations(prev => prev.map(c => {
         if (c.id !== activeId) return c;
         const msgs = c.messages.map(m => {
