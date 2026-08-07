@@ -1,0 +1,55 @@
+{
+  "pipeline_status": "SUCCESS",
+  "total_execution_time_seconds": 3.99,
+  "cleaning_stats": {
+    "total_input_documents": 60,
+    "retained_documents": 60,
+    "filtered_documents": 0,
+    "raw_bytes": 4680,
+    "cleaned_bytes": 4620,
+    "compression_percentage": 1.28,
+    "deduplicated_paragraphs_count": 0
+  },
+  "tokenizer_report": {
+    "vocab_size": 167,
+    "roundtrip": {
+      "total_samples": 10,
+      "exact_matches": 0,
+      "roundtrip_accuracy": 0.0
+    },
+    "compression": {
+      "total_bytes": 767,
+      "total_chars": 767,
+      "total_tokens": 143,
+      "bytes_per_token": 5.36,
+      "chars_per_token": 5.36,
+      "unk_count": 0,
+      "unk_percentage": 0.0
+    }
+  },
+  "model_config": {
+    "vocab_size": 167,
+    "d_model": 128,
+    "n_heads": 4,
+    "n_layers": 2,
+    "d_ff": 512,
+    "max_seq_len": 256,
+    "norm_type": "rmsnorm",
+    "activation": "swiglu",
+    "pos_encoding_type": "rope",
+    "dropout": 0.1,
+    "bias": false,
+    "tie_word_embeddings": true,
+    "rope_base": 10000.0,
+    "layer_norm_eps": 1e-05
+  },
+  "evaluation_report": {
+    "val_loss": 0.0,
+    "perplexity": 1.0,
+    "top_1_accuracy": 0.0,
+    "top_5_accuracy": 0.0,
+    "tokens_per_second": 183.81,
+    "ms_per_token": 5.44
+  },
+  "output_directory": "checkpoints_pipeline"
+}
