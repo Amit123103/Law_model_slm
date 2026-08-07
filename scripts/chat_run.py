@@ -2,8 +2,9 @@
 Interactive REPL Chat script for asking questions and chatting with the Small Language Model.
 """
 
-import sys
 import os
+import sys
+import glob
 from typing import Optional
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -21,8 +22,6 @@ logger = get_logger("slm.chat")
 
 def resolve_checkpoint_path(target_path: Optional[str]) -> Optional[str]:
     """Resolves checkpoint file path from file path, directory, or search folders."""
-    import glob
-    
     if target_path:
         if os.path.isfile(target_path):
             return target_path
@@ -30,7 +29,7 @@ def resolve_checkpoint_path(target_path: Optional[str]) -> Optional[str]:
             pts = sorted(glob.glob(os.path.join(target_path, "*.pt")), key=os.path.getmtime)
             if pts:
                 return pts[-1]
-                
+
     if os.path.isfile("checkpoints/best_model.pt"):
         return "checkpoints/best_model.pt"
 
@@ -40,11 +39,11 @@ def resolve_checkpoint_path(target_path: Optional[str]) -> Optional[str]:
             pts = sorted(glob.glob(os.path.join(sdir, "*.pt")), key=os.path.getmtime)
             if pts:
                 return pts[-1]
-                
+
     return None
 
 
-def start_chat(checkpoint_path: str = None) -> None:
+def start_chat(checkpoint_path: Optional[str] = None) -> None:
     """
     Launches an interactive console terminal chat interface.
     """
@@ -53,22 +52,22 @@ def start_chat(checkpoint_path: str = None) -> None:
     if resolved_path:
         ckpt_dir = os.path.dirname(resolved_path)
         logger.info(f"Loading model checkpoint from {resolved_path}...")
-        
+
         try:
             ckpt_data = torch.load(resolved_path, map_location="cpu", weights_only=False)
         except Exception:
             ckpt_data = torch.load(resolved_path, map_location="cpu")
-            
+
         if isinstance(ckpt_data, dict) and "model_config" in ckpt_data:
             config = ModelConfig.from_dict(ckpt_data["model_config"])
         else:
             config = ModelConfig(vocab_size=2000, d_model=128, n_heads=4, n_layers=2)
-            
+
         model = SLMForCausalLM(config)
-        
+
         manager = CheckpointManager(output_dir=ckpt_dir)
         manager.load_checkpoint(resolved_path, model)
-        
+
         tok_dir = os.path.join(ckpt_dir, "tokenizer")
         if os.path.exists(tok_dir):
             tokenizer = BPETokenizer.load(tok_dir)
@@ -113,7 +112,7 @@ def start_chat(checkpoint_path: str = None) -> None:
             def stream_callback(token_str: str):
                 print(token_str, end="", flush=True)
 
-            response = generator.generate(
+            generator.generate(
                 prompt=prompt,
                 max_new_tokens=100,
                 temperature=0.7,
