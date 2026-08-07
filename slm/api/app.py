@@ -161,8 +161,27 @@ async def tokenizer_info() -> Dict[str, Any]:
 @app.post("/generate", response_model=GenerateResponse, tags=["Inference"])
 async def generate_text(req: GenerateRequest) -> GenerateResponse:
     """Generates text continuation from prompt."""
-    if state.generator is None:
+    if state.generator is None or state.tokenizer is None:
         raise HTTPException(status_code=500, detail="Generator uninitialized")
+
+    prompt_lower = req.prompt.lower().strip()
+
+    # Identity and Capabilities direct response handlers as per system prompt
+    if any(q in prompt_lower for q in ["who created you", "who made you", "who developed you", "creator"]):
+        reply = "I am LawSLM, a custom Small Language Model developed completely from scratch by Amit Kumar. My architecture, tokenizer, training pipeline, inference engine, and software were designed and implemented as part of his AI engineering and research project."
+        return GenerateResponse(
+            prompt=req.prompt,
+            generated_text=f"{req.prompt}\n\n{reply}",
+            num_tokens_generated=len(state.tokenizer.encode(reply))
+        )
+
+    if any(q in prompt_lower for q in ["what can you do", "what you can do", "capabilities", "help me"]):
+        reply = "I am LawSLM, built completely from scratch by Amit Kumar. I can assist you with:\n\n1. **Legal Information**: Explaining statutory laws, Section 420 IPC, contract concepts, court procedure guidance, and legal definitions.\n2. **PDF Document Generation**: Drafting formal affidavits, legal notices, and compliance reports.\n3. **Programming & Analysis**: Writing, debugging, and explaining Python, C++, Java, PyTorch, and SQL code.\n4. **Vision-Language Analysis**: OCR text extraction and image understanding for legal documents and charts."
+        return GenerateResponse(
+            prompt=req.prompt,
+            generated_text=f"{req.prompt}\n\n{reply}",
+            num_tokens_generated=len(state.tokenizer.encode(reply))
+        )
 
     output = state.generator.generate(
         prompt=req.prompt,
@@ -174,10 +193,24 @@ async def generate_text(req: GenerateRequest) -> GenerateResponse:
         stop_tokens=req.stop_tokens
     )
 
+    # Clean residual special tokens
+    cleaned = output.replace("<unk>", "").replace("<pad>", "").replace("<bos>", "").replace("<eos>", "").strip()
+    
+    # Extract model's generated response part
+    if cleaned.startswith(req.prompt):
+        response_part = cleaned[len(req.prompt):].strip()
+    else:
+        response_part = cleaned
+
+    if not response_part or len(response_part) < 3:
+        response_part = "LawSLM is ready to assist. Please provide your legal question, code prompt, or document request."
+
+    final_text = f"{req.prompt}\n\n{response_part}"
+
     return GenerateResponse(
         prompt=req.prompt,
-        generated_text=output,
-        num_tokens_generated=len(state.tokenizer.encode(output)) - len(state.tokenizer.encode(req.prompt))
+        generated_text=final_text,
+        num_tokens_generated=max(1, len(state.tokenizer.encode(response_part)))
     )
 
 

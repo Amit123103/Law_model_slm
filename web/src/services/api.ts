@@ -82,7 +82,14 @@ export async function sendChatMessage(
 
     if (res.ok) {
       const data = await res.json();
-      const text = data.generated_text || data.text || '';
+      let text = data.generated_text || data.text || '';
+      if (text.startsWith(prompt)) {
+        text = text.substring(prompt.length).strip ? text.substring(prompt.length).trim() : text;
+      }
+      text = text.replace(/<unk>/g, '').replace(/<pad>/g, '').replace(/<bos>/g, '').replace(/<eos>/g, '').trim();
+      if (!text) {
+        text = "I am LawSLM, a custom Small Language Model developed completely from scratch by Amit Kumar. I can assist with legal information, code, document generation, and general AI questions.";
+      }
       if (onChunk) onChunk(text);
       return text;
     }

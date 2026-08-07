@@ -196,7 +196,7 @@ class BPETokenizer:
         Returns:
             Decoded string text.
         """
-        special_ids = {self.vocab.bos_id, self.vocab.eos_id, self.vocab.pad_id, self.vocab.mask_id}
+        special_ids = {self.vocab.bos_id, self.vocab.eos_id, self.vocab.pad_id, self.vocab.mask_id, self.vocab.unk_id}
         subwords: List[str] = []
 
         for tid in token_ids:
