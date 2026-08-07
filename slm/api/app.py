@@ -105,7 +105,7 @@ async def startup_event() -> None:
     state.model = SLMForCausalLM(state.model_config)
 
     if os.path.exists(ckpt_path):
-        CheckpointManager.load_checkpoint(ckpt_path, state.model)
+        CheckpointManager().load_checkpoint(ckpt_path, state.model)
         logger.info(f"Loaded trained model weights from {ckpt_path}")
 
     state.generator = TextGenerator(state.model, state.tokenizer)
