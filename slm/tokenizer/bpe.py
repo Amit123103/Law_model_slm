@@ -206,7 +206,7 @@ class BPETokenizer:
             subwords.append(token_str)
 
         raw_text = "".join(subwords)
-        decoded_text = raw_text.replace("\n</w>", "\n").replace("</w>", " ").strip()
+        decoded_text = raw_text.replace("\n</w>", "\n").replace("</w>", " ")
         return decoded_text
 
     def batch_encode(
