@@ -149,10 +149,38 @@ def cmd_chat(args: argparse.Namespace) -> None:
     start_chat(args.checkpoint)
 
 
+def cmd_pipeline(args: argparse.Namespace) -> None:
+    """Handles 'pipeline' CLI command for end-to-end automated execution."""
+    from slm.pipeline import PipelineOrchestrator
+    docs = [
+        "User: hello\nSLM: Hello! How can I assist you with language modeling today?\n",
+        "User: What is law?\nSLM: Law is a system of rules created and enforced by institutions.\n",
+        "User: What is Python?\nSLM: Python is a high-level programming language.\n"
+    ] * 20
+    orchestrator = PipelineOrchestrator(output_dir=args.output_dir)
+    orchestrator.run_full_pipeline(
+        raw_documents=docs,
+        vocab_size=args.vocab_size,
+        max_steps=args.max_steps,
+        epochs=args.epochs,
+        batch_size=args.batch_size,
+        device=args.device
+    )
+
+
 def main() -> None:
     """Main CLI entry point."""
     parser = argparse.ArgumentParser(description="SLM CLI - Small Language Model Tools")
     subparsers = parser.add_subparsers(dest="command", required=True)
+
+    # Pipeline command
+    pipe_parser = subparsers.add_parser("pipeline", help="Run end-to-end automated SLM pipeline")
+    pipe_parser.add_argument("--output_dir", type=str, default="checkpoints_pipeline", help="Output directory")
+    pipe_parser.add_argument("--vocab_size", type=int, default=1000, help="Vocabulary size")
+    pipe_parser.add_argument("--max_steps", type=int, default=100, help="Max training steps")
+    pipe_parser.add_argument("--epochs", type=int, default=20, help="Epochs")
+    pipe_parser.add_argument("--batch_size", type=int, default=4, help="Batch size")
+    pipe_parser.add_argument("--device", type=str, default="cpu", help="Device (cpu/cuda)")
 
     # Train command
     train_parser = subparsers.add_parser("train", help="Train model")
@@ -184,7 +212,9 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    if args.command == "train":
+    if args.command == "pipeline":
+        cmd_pipeline(args)
+    elif args.command == "train":
         cmd_train(args)
     elif args.command == "generate":
         cmd_generate(args)
