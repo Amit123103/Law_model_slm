@@ -61,6 +61,63 @@ export async function fetchSystemPrompt(): Promise<string> {
   return `You are LawSLM, a custom Small Language Model (SLM) developed completely from scratch by Amit Kumar.`;
 }
 
+export async function streamChatMessage(
+  prompt: string,
+  params: ModelParams,
+  onChunk: (chunk: string) => void,
+  onMeta?: (meta: { hasPdf?: boolean; pdfMeta?: any }) => void
+): Promise<string> {
+  try {
+    const res = await fetch(`${API_BASE}/generate/stream`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        prompt: prompt,
+        max_new_tokens: params.maxTokens,
+        temperature: params.temperature
+      })
+    });
+
+    if (res.ok && res.body) {
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let fullText = '';
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+
+        const chunkStr = decoder.decode(value, { stream: true });
+        const lines = chunkStr.split('\n');
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const dataStr = line.slice(6).trim();
+            if (dataStr === '[DONE]') break;
+            try {
+              const parsed = JSON.parse(dataStr);
+              if (parsed.token) {
+                fullText += parsed.token;
+                onChunk(fullText);
+              }
+              if (parsed.has_pdf && onMeta) {
+                onMeta({ hasPdf: parsed.has_pdf, pdfMeta: parsed.pdf_meta });
+              }
+            } catch {
+              // Ignore partial JSON chunks
+            }
+          }
+        }
+      }
+      return fullText;
+    }
+  } catch (err) {
+    console.warn("Backend streaming API fallback.", err);
+  }
+
+  return sendChatMessage(prompt, params, onChunk);
+}
+
 export async function sendChatMessage(
   prompt: string,
   params: ModelParams,
