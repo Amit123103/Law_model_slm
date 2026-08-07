@@ -200,3 +200,32 @@ async def decode_tokens(req: DecodeRequest) -> DecodeResponse:
 
     decoded = state.tokenizer.decode(req.token_ids, skip_special_tokens=req.skip_special_tokens)
     return DecodeResponse(text=decoded)
+
+
+class VisionAnalyzeRequest(BaseModel):
+    image_base64: str = Field(..., example="data:image/png;base64,...")
+    question: str = Field("Describe this image in detail.", example="What legal notice is this?")
+    max_new_tokens: int = Field(128, ge=1, le=512)
+    temperature: float = Field(0.7, ge=0.0, le=2.0)
+
+
+@app.post("/vision/analyze", tags=["Vision-Language"])
+async def analyze_image(req: VisionAnalyzeRequest) -> Dict[str, Any]:
+    """Analyzes uploaded image, extracts OCR text, and answers question using LawSLM Vision Pipeline."""
+    if state.model is None or state.tokenizer is None:
+        raise HTTPException(status_code=500, detail="Model uninitialized")
+
+    try:
+        from slm.vision.vlm import LawSLMVisionPipeline
+        pipeline = LawSLMVisionPipeline(state.model, state.tokenizer)
+        res = pipeline.analyze_image_question(
+            image_base64=req.image_base64,
+            question=req.question,
+            max_new_tokens=req.max_new_tokens,
+            temperature=req.temperature
+        )
+        return res
+    except Exception as e:
+        logger.error(f"Vision analysis failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
