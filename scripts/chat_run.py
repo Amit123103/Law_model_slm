@@ -115,10 +115,10 @@ def start_chat(checkpoint_path: Optional[str] = None) -> None:
             generator.generate(
                 prompt=prompt,
                 max_new_tokens=100,
-                temperature=0.7,
-                top_k=40,
-                top_p=0.9,
-                repetition_penalty=1.1,
+                temperature=0.0,
+                top_k=1,
+                top_p=1.0,
+                repetition_penalty=1.05,
                 stream_callback=stream_callback
             )
             print()

@@ -45,32 +45,27 @@ class CausalLMDataset(Dataset):
 
     def _process_documents(self, documents: List[str]) -> None:
         """
-        Tokenizes documents and builds sliding sequence windows for causal LM training.
+        Tokenizes documents independently and builds sequence windows for causal LM training.
         """
-        all_token_ids: List[int] = []
+        seq_len = self.max_seq_len
+        pad_id = self.tokenizer.vocab.pad_id
 
         for doc in documents:
-            tokens = self.tokenizer.encode(doc, add_special_tokens=True)
-            all_token_ids.extend(tokens)
+            doc_tokens = self.tokenizer.encode(doc, add_special_tokens=True)
+            if not doc_tokens:
+                continue
 
-        # Build sequence windows of size (max_seq_len + 1)
-        # target sequence y is input sequence x shifted right by 1
-        seq_len = self.max_seq_len
-        total_tokens = len(all_token_ids)
-
-        if total_tokens <= seq_len:
-            # Pad short document if needed
-            pad_len = (seq_len + 1) - total_tokens
-            all_token_ids = all_token_ids + [self.tokenizer.vocab.pad_id] * pad_len
-            total_tokens = len(all_token_ids)
-
-        for i in range(0, total_tokens - seq_len, self.stride):
-            chunk = all_token_ids[i:i + seq_len + 1]
-            if len(chunk) == seq_len + 1:
-                input_seq = chunk[:-1]
-                target_seq = chunk[1:]
-                self.input_chunks.append(input_seq)
-                self.target_chunks.append(target_seq)
+            if len(doc_tokens) <= seq_len:
+                pad_len = (seq_len + 1) - len(doc_tokens)
+                chunk = doc_tokens + [pad_id] * pad_len
+                self.input_chunks.append(chunk[:-1])
+                self.target_chunks.append(chunk[1:])
+            else:
+                for i in range(0, len(doc_tokens) - seq_len, self.stride):
+                    chunk = doc_tokens[i:i + seq_len + 1]
+                    if len(chunk) == seq_len + 1:
+                        self.input_chunks.append(chunk[:-1])
+                        self.target_chunks.append(chunk[1:])
 
         logger.info(f"Built CausalLMDataset: total sequence samples = {len(self.input_chunks)}")
 
