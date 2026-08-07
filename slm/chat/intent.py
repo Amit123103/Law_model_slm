@@ -35,8 +35,8 @@ class IntentDetector:
         if any(kw in text for kw in ["who created you", "who made you", "who developed you", "who built you", "who is your creator", "your developer", "your creator"]):
             return IntentType.IDENTITY
 
-        # 2. PDF Creation Requests
-        if any(kw in text for kw in ["create pdf", "generate pdf", "make pdf", "export pdf", "download pdf", "pdf report", "generate report"]):
+        # 2. PDF Creation Requests (prioritized before programming)
+        if any(kw in text for kw in ["create pdf", "generate pdf", "make pdf", "export pdf", "download pdf", "pdf report", "generate report", "pdf"]):
             return IntentType.PDF_GENERATION
 
         # 3. Code Debugging
