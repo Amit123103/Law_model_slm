@@ -1,6 +1,6 @@
 import React from 'react';
-import { X, Sliders, Sparkles, RefreshCw, Cpu, Layers } from 'lucide-react';
-import { ModelParams } from '../types/chat';
+import { X, Sliders, Sparkles } from 'lucide-react';
+import type { ModelParams } from '../types/chat';
 
 interface SettingsModalProps {
   isOpen: boolean;

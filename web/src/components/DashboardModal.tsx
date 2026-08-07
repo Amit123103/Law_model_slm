@@ -1,6 +1,6 @@
 import React from 'react';
-import { X, Activity, Cpu, HardDrive, Database, Layers, CheckCircle, RefreshCw } from 'lucide-react';
-import { ModelStats } from '../types/chat';
+import { X, Activity, Cpu, HardDrive, Database, Layers, CheckCircle } from 'lucide-react';
+import type { ModelStats } from '../types/chat';
 
 interface DashboardModalProps {
   isOpen: boolean;
