@@ -11,7 +11,7 @@ import torch
 from slm.config.config_loader import load_config, save_config
 from slm.config.model_config import ModelConfig
 from slm.config.train_config import TrainConfig
-from slm.dataset.cleaner import TextCleaner
+from slm.dataset.cleaner import DataCleaner
 from slm.dataset.readers import DatasetReader
 from slm.dataset.dataset import CausalLMDataset
 from slm.dataset.loader import create_dataloader
