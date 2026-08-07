@@ -72,9 +72,10 @@ class BPETokenizer:
         logger.info(f"Training BPE Tokenizer targeting vocab_size={vocab_size}...")
 
         # 1. Build initial word counts with character-level representation + end-of-word marker
+        import re
         word_counts: Dict[Tuple[str, ...], int] = defaultdict(int)
         for text in texts:
-            words = text.strip().split()
+            words = re.findall(r"\n|\S+", text)
             for word in words:
                 if not word:
                     continue
@@ -164,7 +165,8 @@ class BPETokenizer:
         Returns:
             List of integer token IDs.
         """
-        words = text.strip().split()
+        import re
+        words = re.findall(r"\n|\S+", text)
         subwords: List[str] = []
 
         for word in words:
@@ -204,7 +206,7 @@ class BPETokenizer:
             subwords.append(token_str)
 
         raw_text = "".join(subwords)
-        decoded_text = raw_text.replace("</w>", " ").strip()
+        decoded_text = raw_text.replace("\n</w>", "\n").replace("</w>", " ").strip()
         return decoded_text
 
     def batch_encode(

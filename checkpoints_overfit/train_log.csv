@@ -1,0 +1,2 @@
+step,epoch,train_loss,val_loss,learning_rate,grad_norm,step_time_ms
+50,34,5.6732,,9.913534e-04,0.5779,114.58
