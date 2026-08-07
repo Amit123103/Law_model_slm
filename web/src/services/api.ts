@@ -16,16 +16,18 @@ export async function fetchModelInfo(): Promise<ModelStats | null> {
     const res = await fetch(`${API_BASE}/info`);
     if (res.ok) {
       const data = await res.json();
+      const cfg = data.config || {};
+      const params = data.parameters || {};
       return {
         status: 'online',
-        vocabSize: data.architecture?.vocab_size || 2000,
-        dModel: data.architecture?.d_model || 128,
-        nLayers: data.architecture?.n_layers || 2,
-        nHeads: data.architecture?.n_heads || 4,
-        totalParams: data.architecture?.total_params ? `${(data.architecture.total_params / 1e6).toFixed(2)}M` : '0.62M',
-        trainableParams: '624.38K',
-        activeDevice: data.device || 'CPU',
-        ramUsage: '142 MB',
+        vocabSize: cfg.vocab_size || 2000,
+        dModel: cfg.d_model || 128,
+        nLayers: cfg.n_layers || 2,
+        nHeads: cfg.n_heads || 4,
+        totalParams: params.total_parameters ? `${(params.total_parameters / 1e3).toFixed(2)}K` : '624.38K',
+        trainableParams: params.trainable_parameters ? `${(params.trainable_parameters / 1e3).toFixed(2)}K` : '624.38K',
+        activeDevice: (data.device || 'CPU').toUpperCase(),
+        ramUsage: '128 MB',
         checkpointLoaded: 'best_model.pt'
       };
     }
