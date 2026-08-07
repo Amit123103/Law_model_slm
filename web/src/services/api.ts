@@ -1,4 +1,4 @@
-import { ModelParams, ModelStats } from '../types/chat';
+import type { ModelParams, ModelStats } from '../types/chat';
 
 const API_BASE = 'http://localhost:8000';
 
