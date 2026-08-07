@@ -67,15 +67,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <aside
-      className={`fixed md:static inset-y-0 left-0 z-30 w-72 bg-white dark:bg-darkbg-800 border-r border-slate-200 dark:border-slate-800 flex flex-col transition-all duration-300 transform ${
+      className={`fixed md:static inset-y-0 left-0 z-30 w-72 bg-slate-900 border-r border-slate-800 flex flex-col transition-all duration-300 transform ${
         open ? 'translate-x-0' : '-translate-x-full md:translate-x-0 md:w-16'
       }`}
     >
       {/* Top Header Actions */}
-      <div className="p-3 flex items-center justify-between border-b border-slate-100 dark:border-slate-750">
+      <div className="p-3 flex items-center justify-between border-b border-slate-800">
         <button
           onClick={onNewChat}
-          className={`flex-1 flex items-center justify-center space-x-2 py-2.5 px-3 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-medium text-sm shadow-md shadow-brand-500/25 transition-all ${
+          className={`flex-1 flex items-center justify-center space-x-2 py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm shadow-md shadow-blue-500/20 transition-all ${
             !open && 'md:px-0 md:w-10'
           }`}
         >
@@ -85,7 +85,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         <button
           onClick={() => setOpen(!open)}
-          className="p-2 rounded-xl text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 hidden md:block ml-2"
+          className="p-2 rounded-xl text-slate-400 hover:bg-slate-800 hidden md:block ml-2"
           title={open ? "Collapse Sidebar" : "Expand Sidebar"}
         >
           {open ? <PanelLeftClose className="w-4 h-4" /> : <PanelLeftOpen className="w-4 h-4" />}
@@ -102,7 +102,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               placeholder="Search conversations..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
-              className="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl bg-slate-100 dark:bg-darkbg-900 border border-transparent focus:border-brand-500 focus:bg-white dark:focus:bg-darkbg-900 outline-none transition-colors"
+              className="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl bg-slate-800 border border-slate-700 text-white placeholder-slate-400 outline-none focus:border-blue-500"
             />
           </div>
         </div>
@@ -164,25 +164,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* Footer System Nav */}
-      <div className="p-2 border-t border-slate-100 dark:border-slate-750 space-y-1">
+      <div className="p-2 border-t border-slate-800 space-y-1.5">
         <button
           onClick={onOpenDashboard}
-          className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+          className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-slate-200 transition-colors"
         >
-          <Activity className="w-4 h-4 text-brand-500" />
+          <Activity className="w-4 h-4 text-blue-400" />
           <span className={`${!open && 'md:hidden'}`}>Model Dashboard</span>
         </button>
 
         <button
           onClick={onOpenSettings}
-          className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+          className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-slate-200 transition-colors"
         >
-          <Settings className="w-4 h-4 text-slate-500" />
+          <Settings className="w-4 h-4 text-slate-400" />
           <span className={`${!open && 'md:hidden'}`}>Parameters & Settings</span>
         </button>
 
         {open && (
-          <div className="pt-2 px-3 pb-1 border-t border-slate-100 dark:border-slate-750/60 flex items-center justify-between text-[11px] text-slate-400">
+          <div className="pt-2 px-3 pb-1 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
             <span>LawSLM Engine</span>
             <span>By Amit Kumar</span>
           </div>
@@ -226,19 +226,19 @@ const ConversationItem: React.FC<ItemProps> = ({
       onClick={onSelect}
       className={`group relative flex items-center justify-between px-3 py-2 rounded-xl text-xs cursor-pointer transition-colors ${
         active
-          ? 'bg-brand-50 dark:bg-brand-500/15 text-brand-600 dark:text-brand-400 font-semibold'
-          : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-750'
+          ? 'bg-blue-600/20 border border-blue-500/40 text-blue-400 font-semibold'
+          : 'text-slate-300 hover:bg-slate-800 border border-transparent'
       }`}
     >
       <div className="flex items-center space-x-2.5 min-w-0">
-        <MessageSquare className="w-4 h-4 flex-shrink-0 text-slate-400 group-hover:text-brand-500" />
+        <MessageSquare className="w-4 h-4 flex-shrink-0 text-slate-400 group-hover:text-blue-400" />
         {editing ? (
           <input
             type="text"
             value={editingTitle}
             onChange={e => setEditingTitle(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && onSaveRename()}
-            className="w-full px-1.5 py-0.5 text-xs bg-white dark:bg-darkbg-900 border border-brand-500 rounded outline-none"
+            className="w-full px-1.5 py-0.5 text-xs bg-slate-900 border border-blue-500 rounded text-white outline-none"
             autoFocus
           />
         ) : (
@@ -250,18 +250,18 @@ const ConversationItem: React.FC<ItemProps> = ({
         <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
           {editing ? (
             <>
-              <button onClick={onSaveRename} className="p-1 hover:text-emerald-500"><Check className="w-3.5 h-3.5" /></button>
-              <button onClick={onCancelRename} className="p-1 hover:text-rose-500"><X className="w-3.5 h-3.5" /></button>
+              <button onClick={onSaveRename} className="p-1 hover:text-emerald-400"><Check className="w-3.5 h-3.5" /></button>
+              <button onClick={onCancelRename} className="p-1 hover:text-rose-400"><X className="w-3.5 h-3.5" /></button>
             </>
           ) : (
             <>
-              <button onClick={e => { e.stopPropagation(); onPin(); }} className="p-1 hover:text-amber-500">
-                <Pin className={`w-3.5 h-3.5 ${conversation.pinned ? 'fill-amber-500 text-amber-500' : ''}`} />
+              <button onClick={e => { e.stopPropagation(); onPin(); }} className="p-1 hover:text-amber-400">
+                <Pin className={`w-3.5 h-3.5 ${conversation.pinned ? 'fill-amber-400 text-amber-400' : ''}`} />
               </button>
-              <button onClick={e => { e.stopPropagation(); onStartRename(); }} className="p-1 hover:text-brand-500">
+              <button onClick={e => { e.stopPropagation(); onStartRename(); }} className="p-1 hover:text-blue-400">
                 <Edit3 className="w-3.5 h-3.5" />
               </button>
-              <button onClick={e => { e.stopPropagation(); onDelete(); }} className="p-1 hover:text-rose-500">
+              <button onClick={e => { e.stopPropagation(); onDelete(); }} className="p-1 hover:text-rose-400">
                 <Trash2 className="w-3.5 h-3.5" />
               </button>
             </>
