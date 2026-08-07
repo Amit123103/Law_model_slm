@@ -24,20 +24,20 @@ def resolve_checkpoint_path(target_path: Optional[str]) -> Optional[str]:
     import glob
     
     if target_path:
-        # 1. Exact file path exists
         if os.path.isfile(target_path):
             return target_path
-        # 2. Directory path passed, search for .pt files
         if os.path.isdir(target_path):
-            pts = sorted(glob.glob(os.path.join(target_path, "*.pt")))
+            pts = sorted(glob.glob(os.path.join(target_path, "*.pt")), key=os.path.getmtime)
             if pts:
                 return pts[-1]
                 
-    # 3. Fallback search in default output directories
-    search_dirs = ["checkpoints_nano", "checkpoints", "checkpoints_micro", "checkpoints_base"]
+    if os.path.isfile("checkpoints/best_model.pt"):
+        return "checkpoints/best_model.pt"
+
+    search_dirs = ["checkpoints", "checkpoints_nano", "checkpoints_pipeline", "checkpoints_micro", "checkpoints_base"]
     for sdir in search_dirs:
         if os.path.exists(sdir):
-            pts = sorted(glob.glob(os.path.join(sdir, "*.pt")))
+            pts = sorted(glob.glob(os.path.join(sdir, "*.pt")), key=os.path.getmtime)
             if pts:
                 return pts[-1]
                 
@@ -48,13 +48,6 @@ def start_chat(checkpoint_path: str = None) -> None:
     """
     Launches an interactive console terminal chat interface.
     """
-    print("\n" + "=" * 65)
-    print("  LawSLM INTERACTIVE ASSISTANT (Built Completely From Scratch)")
-    print("  Role: Legal Information, General AI, Programming & Analysis")
-    print("=" * 65)
-    print("Type your question/prompt below. Type 'exit', 'quit', or 'q' to end session.")
-    print("=" * 65 + "\n")
-
     resolved_path = resolve_checkpoint_path(checkpoint_path)
 
     if resolved_path:
@@ -96,6 +89,13 @@ def start_chat(checkpoint_path: str = None) -> None:
         tokenizer.train_on_texts(corpus, vocab_size=2000)
 
     generator = TextGenerator(model, tokenizer)
+
+    print("\n" + "=" * 65)
+    print("  LawSLM INTERACTIVE ASSISTANT (Built Completely From Scratch)")
+    print("  Role: Legal Information, General AI, Programming & Analysis")
+    print("=" * 65)
+    print("Type your question/prompt below. Type 'exit', 'quit', or 'q' to end session.")
+    print("=" * 65 + "\n")
 
     while True:
         try:
