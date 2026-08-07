@@ -73,10 +73,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
       }`}
     >
       {/* Top Header Actions */}
-      <div className="p-4 flex items-center justify-between border-b border-slate-800">
+      <div className="p-4 flex items-center justify-between border-b border-orange-500/15">
         <button
           onClick={onNewChat}
-          className={`flex-1 flex items-center justify-center space-x-2 py-3 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm shadow-md shadow-blue-500/25 transition-all ${
+          className={`flex-1 flex items-center justify-center space-x-2 py-3 px-4 rounded-xl bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-bold text-sm shadow-md shadow-orange-500/25 transition-all ${
             !open && 'md:px-0 md:w-10'
           }`}
         >
@@ -86,7 +86,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         <button
           onClick={() => setOpen(!open)}
-          className="p-2.5 rounded-xl text-slate-400 hover:bg-slate-800 hidden md:block ml-2 transition-colors"
+          className="p-2.5 rounded-xl text-slate-400 hover:bg-white/10 hidden md:block ml-2 transition-colors"
           title={open ? "Collapse Sidebar" : "Expand Sidebar"}
         >
           {open ? <PanelLeftClose className="w-5 h-5" /> : <PanelLeftOpen className="w-5 h-5" />}
@@ -103,7 +103,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               placeholder="Search conversations..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-3.5 py-2 text-xs rounded-xl bg-slate-800/80 border border-slate-700/80 text-white placeholder-slate-400 outline-none focus:border-blue-500 transition-all"
+              className="w-full pl-9 pr-3.5 py-2 text-xs rounded-xl bg-white/5 border border-orange-500/15 text-white placeholder-slate-400 outline-none focus:border-orange-500 transition-all"
             />
           </div>
         </div>
@@ -189,15 +189,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <div className="p-3 border-t border-slate-800 space-y-2">
         <button
           onClick={onOpenDashboard}
-          className="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-slate-200 font-medium transition-all"
+          className="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs bg-white/5 hover:bg-white/10 border border-orange-500/15 text-slate-200 font-medium transition-all"
         >
-          <Activity className="w-4 h-4 text-blue-400" />
+          <Activity className="w-4 h-4 text-orange-400" />
           <span className={`${!open && 'md:hidden'}`}>Model Dashboard</span>
         </button>
 
         <button
           onClick={onOpenSettings}
-          className="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-slate-200 font-medium transition-all"
+          className="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs bg-white/5 hover:bg-white/10 border border-orange-500/15 text-slate-200 font-medium transition-all"
         >
           <Settings className="w-4 h-4 text-slate-400" />
           <span className={`${!open && 'md:hidden'}`}>Parameters & Settings</span>
