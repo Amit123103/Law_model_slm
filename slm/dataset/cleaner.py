@@ -1,99 +1,123 @@
 """
-Dataset preprocessing, text cleaning, normalization, deduplication, and sentence splitting.
+Automated Data Cleaner and Preprocessor for SLM training datasets.
+Handles Unicode NFKC normalization, HTML tag stripping, control character removal,
+paragraph deduplication, minimum length filtering, and cleaning statistics generation.
 """
 
 import re
 import unicodedata
-from typing import List, Set, Dict, Any, Optional
+import hashlib
+from typing import List, Dict, Any, Tuple
+from slm.utils.logger import get_logger
+
+logger = get_logger("slm.dataset.cleaner")
 
 
-class TextCleaner:
-    """
-    Comprehensive text cleaning and normalization pipeline for raw text corpora.
-    """
+class DataCleaner:
+    """Cleans, normalizes, deduplicates, and filters raw text corpora."""
 
-    def __init__(self, strip_html: bool = True, normalize_unicode: bool = True) -> None:
-        self.strip_html = strip_html
-        self.normalize_unicode = normalize_unicode
-
-    def clean_text(self, text: str) -> str:
-        """
-        Applies cleaning operations to a string of raw text.
-
-        Args:
-            text: Input raw text string.
-
-        Returns:
-            Cleaned and normalized text.
-        """
-        if not text:
-            return ""
-
-        # 1. Unicode normalization (NFC)
-        if self.normalize_unicode:
-            text = unicodedata.normalize("NFC", text)
-
-        # 2. Strip HTML/XML tags
-        if self.strip_html:
-            text = re.sub(r"<[^>]+>", " ", text)
-
-        # 3. Normalize whitespace (collapse multiple spaces/tabs into single space)
-        text = re.sub(r"[ \t]+", " ", text)
-        text = re.sub(r"\n{3,}", "\n\n", text)
-
-        return text.strip()
+    def __init__(self, min_doc_chars: int = 20, min_doc_words: int = 5):
+        self.min_doc_chars = min_doc_chars
+        self.min_doc_words = min_doc_words
 
     @staticmethod
-    def deduplicate(texts: List[str]) -> List[str]:
-        """
-        Removes exact duplicate documents while preserving sequence order.
-
-        Args:
-            texts: List of text documents.
-
-        Returns:
-            Deduplicated list of text documents.
-        """
-        seen: Set[str] = set()
-        unique_texts: List[str] = []
-        for text in texts:
-            cleaned = text.strip()
-            if cleaned and cleaned not in seen:
-                seen.add(cleaned)
-                unique_texts.append(cleaned)
-        return unique_texts
+    def normalize_unicode(text: str) -> str:
+        """Applies Unicode NFKC normalization."""
+        return unicodedata.normalize("NFKC", text)
 
     @staticmethod
-    def split_sentences(text: str) -> List[str]:
-        """
-        Splits text into individual sentences using punctuation boundaries.
-        """
-        sentence_endings = re.compile(r"(?<=[.!?])\s+")
-        sentences = sentence_endings.split(text.strip())
-        return [s.strip() for s in sentences if s.strip()]
+    def strip_html_tags(text: str) -> str:
+        """Removes HTML tags and unescapes HTML entities."""
+        clean_re = re.compile(r"<[^>]+>")
+        return clean_re.sub("", text)
 
     @staticmethod
-    def chunk_document(text: str, max_words_per_chunk: int = 512, overlap: int = 64) -> List[str]:
+    def remove_control_characters(text: str) -> str:
+        """Removes non-printable control characters except for space and newline."""
+        return "".join(ch for ch in text if unicodedata.category(ch)[0] != "C" or ch in ("\n", "\t", " "))
+
+    @staticmethod
+    def normalize_whitespace(text: str) -> str:
+        """Normalizes multiple horizontal spaces and trims blank lines."""
+        lines = [re.sub(r"[ \t]+", " ", line).strip() for line in text.split("\n")]
+        # Remove consecutive empty lines
+        cleaned_lines: List[str] = []
+        for line in lines:
+            if line or (cleaned_lines and cleaned_lines[-1]):
+                cleaned_lines.append(line)
+        return "\n".join(cleaned_lines).strip()
+
+    def clean_document(self, text: str) -> str:
+        """Applies full cleaning pipeline to a single document."""
+        text = self.normalize_unicode(text)
+        text = self.strip_html_tags(text)
+        text = self.remove_control_characters(text)
+        text = self.normalize_whitespace(text)
+        return text
+
+    def deduplicate_paragraphs(self, text: str) -> str:
+        """Deduplicates identical paragraphs within a document."""
+        paragraphs = text.split("\n\n")
+        seen_hashes = set()
+        unique_paragraphs = []
+
+        for p in paragraphs:
+            p_clean = p.strip()
+            if not p_clean:
+                continue
+            h = hashlib.md5(p_clean.encode("utf-8")).hexdigest()
+            if h not in seen_hashes:
+                seen_hashes.add(h)
+                unique_paragraphs.append(p_clean)
+
+        return "\n\n".join(unique_paragraphs)
+
+    def is_valid_document(self, text: str) -> bool:
+        """Checks if document meets minimum length and word count criteria."""
+        if len(text) < self.min_doc_chars:
+            return False
+        words = text.split()
+        if len(words) < self.min_doc_words:
+            return False
+        return True
+
+    def process_corpus(self, raw_documents: List[str]) -> Tuple[List[str], Dict[str, Any]]:
         """
-        Chunks text into overlapping fixed-size word windows.
-
-        Args:
-            text: Document text string.
-            max_words_per_chunk: Maximum words per chunk.
-            overlap: Overlapping word count between consecutive chunks.
-
-        Returns:
-            List of chunk strings.
+        Cleans, deduplicates, and filters a list of raw documents while recording statistics.
         """
-        words = text.strip().split()
-        if len(words) <= max_words_per_chunk:
-            return [text]
+        cleaned_docs = []
+        total_raw_bytes = 0
+        total_cleaned_bytes = 0
+        filtered_short_count = 0
+        deduped_paragraphs_count = 0
 
-        chunks = []
-        step = max_words_per_chunk - overlap
-        for i in range(0, len(words), step):
-            chunk_words = words[i:i + max_words_per_chunk]
-            if len(chunk_words) > 0:
-                chunks.append(" ".join(chunk_words))
+        for doc in raw_documents:
+            raw_bytes = len(doc.encode("utf-8"))
+            total_raw_bytes += raw_bytes
 
-        return chunks
+            cleaned = self.clean_document(doc)
+            deduped = self.deduplicate_paragraphs(cleaned)
+
+            if len(cleaned) != len(deduped):
+                deduped_paragraphs_count += 1
+
+            if not self.is_valid_document(deduped):
+                filtered_short_count += 1
+                continue
+
+            cleaned_bytes = len(deduped.encode("utf-8"))
+            total_cleaned_bytes += cleaned_bytes
+            cleaned_docs.append(deduped)
+
+        stats = {
+            "total_input_documents": len(raw_documents),
+            "retained_documents": len(cleaned_docs),
+            "filtered_documents": filtered_short_count,
+            "raw_bytes": total_raw_bytes,
+            "cleaned_bytes": total_cleaned_bytes,
+            "compression_percentage": round((1.0 - (total_cleaned_bytes / (total_raw_bytes + 1e-9))) * 100, 2),
+            "deduplicated_paragraphs_count": deduped_paragraphs_count
+        }
+
+        logger.info(f"Processed corpus: {stats['retained_documents']}/{stats['total_input_documents']} documents retained.")
+        return cleaned_docs, stats

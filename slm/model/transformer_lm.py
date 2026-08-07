@@ -87,6 +87,8 @@ class SLMForCausalLM(nn.Module):
         self,
         input_ids: torch.Tensor,
         targets: Optional[torch.Tensor] = None,
+        target_ids: Optional[torch.Tensor] = None,
+        labels: Optional[torch.Tensor] = None,
         attention_mask: Optional[torch.Tensor] = None
     ) -> Tuple[torch.Tensor, Optional[torch.Tensor]]:
         """
@@ -95,6 +97,8 @@ class SLMForCausalLM(nn.Module):
         Args:
             input_ids: Long Tensor of token IDs [batch_size, seq_len].
             targets: Optional ground-truth target token IDs [batch_size, seq_len].
+            target_ids: Alternative ground-truth target token IDs.
+            labels: Alternative ground-truth target token IDs.
             attention_mask: Optional attention mask Tensor [batch_size, 1, 1, seq_len].
 
         Returns:
