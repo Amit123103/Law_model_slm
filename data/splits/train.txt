@@ -1,98 +1,3 @@
-User: What is Python?
-SLM: Python is a high-level programming language.
-
-<|endoftext|>
-
-User: What is Python?
-SLM: Python is a high-level programming language.
-
-<|endoftext|>
-
-User: hello
-SLM: Hello! How can I assist you with language modeling today?
-
-<|endoftext|>
-
-User: What is Python?
-SLM: Python is a high-level programming language.
-
-<|endoftext|>
-
-User: What is law?
-SLM: Law is a system of rules created and enforced by institutions.
-
-<|endoftext|>
-
-User: What is Python?
-SLM: Python is a high-level programming language.
-
-<|endoftext|>
-
-User: What is law?
-SLM: Law is a system of rules created and enforced by institutions.
-
-<|endoftext|>
-
-User: What is law?
-SLM: Law is a system of rules created and enforced by institutions.
-
-<|endoftext|>
-
-User: hello
-SLM: Hello! How can I assist you with language modeling today?
-
-<|endoftext|>
-
-User: What is law?
-SLM: Law is a system of rules created and enforced by institutions.
-
-<|endoftext|>
-
-User: hello
-SLM: Hello! How can I assist you with language modeling today?
-
-<|endoftext|>
-
-User: hello
-SLM: Hello! How can I assist you with language modeling today?
-
-<|endoftext|>
-
-User: What is law?
-SLM: Law is a system of rules created and enforced by institutions.
-
-<|endoftext|>
-
-User: hello
-SLM: Hello! How can I assist you with language modeling today?
-
-<|endoftext|>
-
-User: hello
-SLM: Hello! How can I assist you with language modeling today?
-
-<|endoftext|>
-
-User: What is law?
-SLM: Law is a system of rules created and enforced by institutions.
-
-<|endoftext|>
-
-User: hello
-SLM: Hello! How can I assist you with language modeling today?
-
-<|endoftext|>
-
-User: hello
-SLM: Hello! How can I assist you with language modeling today?
-
-<|endoftext|>
-
-User: What is Python?
-SLM: Python is a high-level programming language.
-
-<|endoftext|>
-
 User: What is law?
 SLM: Law is a system of rules created and enforced by institutions.
 
@@ -118,6 +23,21 @@ SLM: Law is a system of rules created and enforced by institutions.
 
 <|endoftext|>
 
+User: hello
+SLM: Hello! How can I assist you with language modeling today?
+
+<|endoftext|>
+
+User: What is Python?
+SLM: Python is a high-level programming language.
+
+<|endoftext|>
+
+User: hello
+SLM: Hello! How can I assist you with language modeling today?
+
+<|endoftext|>
+
 User: What is Python?
 SLM: Python is a high-level programming language.
 
@@ -133,8 +53,28 @@ SLM: Hello! How can I assist you with language modeling today?
 
 <|endoftext|>
 
+User: What is law?
+SLM: Law is a system of rules created and enforced by institutions.
+
+<|endoftext|>
+
 User: What is Python?
 SLM: Python is a high-level programming language.
+
+<|endoftext|>
+
+User: hello
+SLM: Hello! How can I assist you with language modeling today?
+
+<|endoftext|>
+
+User: What is law?
+SLM: Law is a system of rules created and enforced by institutions.
+
+<|endoftext|>
+
+User: hello
+SLM: Hello! How can I assist you with language modeling today?
 
 <|endoftext|>
 
@@ -145,41 +85,6 @@ SLM: Law is a system of rules created and enforced by institutions.
 
 User: What is law?
 SLM: Law is a system of rules created and enforced by institutions.
-
-<|endoftext|>
-
-User: hello
-SLM: Hello! How can I assist you with language modeling today?
-
-<|endoftext|>
-
-User: What is law?
-SLM: Law is a system of rules created and enforced by institutions.
-
-<|endoftext|>
-
-User: hello
-SLM: Hello! How can I assist you with language modeling today?
-
-<|endoftext|>
-
-User: What is Python?
-SLM: Python is a high-level programming language.
-
-<|endoftext|>
-
-User: hello
-SLM: Hello! How can I assist you with language modeling today?
-
-<|endoftext|>
-
-User: hello
-SLM: Hello! How can I assist you with language modeling today?
-
-<|endoftext|>
-
-User: What is Python?
-SLM: Python is a high-level programming language.
 
 <|endoftext|>
 
@@ -210,28 +115,3 @@ SLM: Law is a system of rules created and enforced by institutions.
 
 User: hello
 SLM: Hello! How can I assist you with language modeling today?
-
-<|endoftext|>
-
-User: What is Python?
-SLM: Python is a high-level programming language.
-
-<|endoftext|>
-
-User: hello
-SLM: Hello! How can I assist you with language modeling today?
-
-<|endoftext|>
-
-User: What is law?
-SLM: Law is a system of rules created and enforced by institutions.
-
-<|endoftext|>
-
-User: What is Python?
-SLM: Python is a high-level programming language.
-
-<|endoftext|>
-
-User: What is law?
-SLM: Law is a system of rules created and enforced by institutions.
