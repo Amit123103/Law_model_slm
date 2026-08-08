@@ -1,4 +1,21 @@
+---
+language:
+- en
+license: mit
+tags:
+- law
+- slm
+- causal-lm
+- pytorch
+- transformer
+- text-generation
+pipeline_tag: text-generation
+inference: true
+model_name: LawSLM
+---
+
 # Model Card — LawSLM (Small Language Model)
+
 
 ## Model Overview
 

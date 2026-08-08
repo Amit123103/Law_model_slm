@@ -1,4 +1,22 @@
+---
+language:
+- en
+license: mit
+tags:
+- law
+- slm
+- causal-lm
+- pytorch
+- transformer
+- text-generation
+pipeline_tag: text-generation
+inference: true
+library_name: slm
+model_name: LawSLM
+---
+
 # Small Language Model (SLM) — Complete Industrial Manual
+
 
 An industrial-grade, decoder-only Small Language Model (SLM) ecosystem built completely from scratch in pure Python and PyTorch primitive operations.
 
@@ -368,6 +386,25 @@ pytest -v tests/
 ```
 
 ---
+
+## Hugging Face Hub Upload & Metadata Guide
+
+### 1. Fixed Metadata & Unsafe File Exclusions
+- **YAML Frontmatter Metadata**: Added valid Hugging Face YAML frontmatter to `README.md` and `MODEL_CARD.md` to resolve the *YAML Metadata Warning: empty or missing yaml metadata in repo card*.
+- **Unsafe File Scanning**: Added `.gitignore` and uploader rules excluding `node_modules/`, `web/node_modules/`, `dist/`, and binary build artifacts to eliminate security scanner flags.
+
+### 2. Push Code & Model to Hugging Face Hub
+
+Push your model weights, configs, tokenizer, and repo card automatically using [push_to_hf.py](file:///c:/Users/amita/myprojects/lawslm/scripts/push_to_hf.py):
+
+```bash
+# Set your Hugging Face Access Token
+export HF_TOKEN="hf_your_access_token_here"
+
+# Push model and repository card
+python scripts/push_to_hf.py --repo_id "your-username/lawslm"
+```
+
 
 ## Project Directory Hierarchy
 
