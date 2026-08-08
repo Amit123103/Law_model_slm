@@ -397,13 +397,19 @@ pytest -v tests/
 
 Push your model weights, configs, tokenizer, and repo card automatically using [push_to_hf.py](file:///c:/Users/amita/myprojects/lawslm/scripts/push_to_hf.py):
 
+#### Option A: Pass token directly via CLI flag (Recommended)
 ```bash
-# Set your Hugging Face Access Token
-export HF_TOKEN="hf_your_access_token_here"
-
-# Push model and repository card
-python scripts/push_to_hf.py --repo_id "your-username/lawslm"
+python scripts/push_to_hf.py --repo_id Amit123103/Law_model_slm --token hf_YOUR_HF_ACCESS_TOKEN
 ```
+
+#### Option B: Set environment variable in PowerShell
+```powershell
+$env:HF_TOKEN="hf_YOUR_HF_ACCESS_TOKEN"
+python scripts/push_to_hf.py --repo_id Amit123103/Law_model_slm
+```
+
+*(Note: Replace `hf_YOUR_HF_ACCESS_TOKEN` with your personal Hugging Face access token from https://huggingface.co/settings/tokens with Write permissions).*
+
 
 
 ## Project Directory Hierarchy

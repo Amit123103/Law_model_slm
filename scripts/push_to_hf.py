@@ -20,8 +20,33 @@ def push_to_huggingface(repo_id: str, local_dir: str = ".", token: str = None, p
     """
     Pushes project repository and model card to Hugging Face Hub.
     """
+    # Clean token string if wrapped in quotes
+    if token:
+        token = token.strip('"').strip("'").strip()
+    else:
+        token = os.getenv("HF_TOKEN")
+        if token:
+            token = token.strip('"').strip("'").strip()
+
+    if "your-username" in repo_id:
+        print("\n[ERROR] 'your-username' is a placeholder!")
+        print("Please replace 'your-username' with your real Hugging Face account username.")
+        print("Example: python scripts/push_to_hf.py --repo_id Amit123103/Law_model_slm --token hf_XXXXX\n")
+        sys.exit(1)
+
     api = HfApi(token=token)
-    
+
+    # Auto-resolve username if only repo name is supplied
+    if "/" not in repo_id and token:
+        try:
+            user_info = api.whoami(token=token)
+            username = user_info.get("name")
+            if username:
+                repo_id = f"{username}/{repo_id}"
+                print(f"Auto-resolved Hugging Face repository ID to: '{repo_id}'")
+        except Exception:
+            pass
+
     print(f"Creating/verifying Hugging Face repository '{repo_id}'...")
     create_repo(repo_id=repo_id, repo_type="model", private=private, exist_ok=True, token=token)
     
@@ -57,8 +82,8 @@ def push_to_huggingface(repo_id: str, local_dir: str = ".", token: str = None, p
 
 def main():
     parser = argparse.ArgumentParser(description="Push LawSLM code, config, and Model Card to Hugging Face Hub.")
-    parser.add_argument("--repo_id", type=str, required=True, help="Hugging Face repo ID (e.g., 'your-username/lawslm')")
-    parser.add_argument("--token", type=str, default=os.getenv("HF_TOKEN"), help="Hugging Face API token")
+    parser.add_argument("--repo_id", type=str, required=True, help="Hugging Face repo ID (e.g., 'Amit123103/Law_model_slm')")
+    parser.add_argument("--token", type=str, default=os.getenv("HF_TOKEN"), help="Hugging Face User Access Token (Write permission)")
     parser.add_argument("--private", action="store_true", help="Create as private repository")
     args = parser.parse_args()
 
